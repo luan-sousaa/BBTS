@@ -1,0 +1,4 @@
+beautifulsoup4==4.13.4
+fpdf2==2.8.3
+playwright==1.51.0
+protobuf==6.31.0

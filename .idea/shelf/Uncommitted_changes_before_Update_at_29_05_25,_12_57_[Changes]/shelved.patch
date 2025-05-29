@@ -1,0 +1,194 @@
+Index: .idea/misc.xml
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+diff --git a/.idea/misc.xml b/.idea/misc.xml
+deleted file mode 100644
+--- a/.idea/misc.xml	(revision 1b0a77f66f705441902e6c6cdd2baad98cc2ad2a)
++++ /dev/null	(revision 1b0a77f66f705441902e6c6cdd2baad98cc2ad2a)
+@@ -1,7 +0,0 @@
+-<?xml version="1.0" encoding="UTF-8"?>
+-<project version="4">
+-  <component name="Black">
+-    <option name="sdkName" value="Python 3.9 (analisador_video_py)" />
+-  </component>
+-  <component name="ProjectRootManager" version="2" project-jdk-name="Python 3.9 (analisador_video_py)" project-jdk-type="Python SDK" />
+-</project>
+\ No newline at end of file
+Index: .idea/modules.xml
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+diff --git a/.idea/modules.xml b/.idea/modules.xml
+deleted file mode 100644
+--- a/.idea/modules.xml	(revision 1b0a77f66f705441902e6c6cdd2baad98cc2ad2a)
++++ /dev/null	(revision 1b0a77f66f705441902e6c6cdd2baad98cc2ad2a)
+@@ -1,8 +0,0 @@
+-<?xml version="1.0" encoding="UTF-8"?>
+-<project version="4">
+-  <component name="ProjectModuleManager">
+-    <modules>
+-      <module fileurl="file://$PROJECT_DIR$/.idea/BBTS.iml" filepath="$PROJECT_DIR$/.idea/BBTS.iml" />
+-    </modules>
+-  </component>
+-</project>
+\ No newline at end of file
+Index: .idea/BBTS.iml
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+diff --git a/.idea/BBTS.iml b/.idea/BBTS.iml
+deleted file mode 100644
+--- a/.idea/BBTS.iml	(revision 1b0a77f66f705441902e6c6cdd2baad98cc2ad2a)
++++ /dev/null	(revision 1b0a77f66f705441902e6c6cdd2baad98cc2ad2a)
+@@ -1,8 +0,0 @@
+-<?xml version="1.0" encoding="UTF-8"?>
+-<module type="PYTHON_MODULE" version="4">
+-  <component name="NewModuleRootManager">
+-    <content url="file://$MODULE_DIR$" />
+-    <orderEntry type="jdk" jdkName="Python 3.9 (analisador_video_py)" jdkType="Python SDK" />
+-    <orderEntry type="sourceFolder" forTests="false" />
+-  </component>
+-</module>
+\ No newline at end of file
+Index: .idea/inspectionProfiles/profiles_settings.xml
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+diff --git a/.idea/inspectionProfiles/profiles_settings.xml b/.idea/inspectionProfiles/profiles_settings.xml
+deleted file mode 100644
+--- a/.idea/inspectionProfiles/profiles_settings.xml	(revision 1b0a77f66f705441902e6c6cdd2baad98cc2ad2a)
++++ /dev/null	(revision 1b0a77f66f705441902e6c6cdd2baad98cc2ad2a)
+@@ -1,6 +0,0 @@
+-<component name="InspectionProjectProfileManager">
+-  <settings>
+-    <option name="USE_PROJECT_PROFILE" value="false" />
+-    <version value="1.0" />
+-  </settings>
+-</component>
+\ No newline at end of file
+Index: main.py
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+diff --git a/main.py b/main.py
+deleted file mode 100644
+--- a/main.py	(revision 1b0a77f66f705441902e6c6cdd2baad98cc2ad2a)
++++ /dev/null	(revision 1b0a77f66f705441902e6c6cdd2baad98cc2ad2a)
+@@ -1,78 +0,0 @@
+-from playwright.sync_api import sync_playwright
+-import time
+-from bs4 import BeautifulSoup
+-from google import genai
+-from google.genai import types
+-import reportlab.lib.pagesizes as pagesizes
+-from reportlab.pdfgen import canvas
+-from textwrap import wrap
+-from reportlab.lib.pagesizes import A4
+-import re
+-from fpdf import FPDF
+-from fpdf.enums import XPos, YPos
+-
+-
+-def procurar_licitacoes():
+-
+-    with sync_playwright() as p:
+-        navegador = p.chromium.launch(headless=False) #inicia nosso navegador , nesse caso o crhome
+-        pagina = navegador.new_page() #abre uma nova aba no nosso navegador
+-        pagina.goto("https://pncp.gov.br/app/editais?q=&status=recebendo_proposta&pagina=1") #vai ate nossa pagina de licitacoes
+-        # preenche o campo de palavras chaves
+-        pagina.fill('input[id="keyword"]', 'microsoft')
+-
+-        #filtros principais
+-        #modalidades
+-        pagina.click('//*[@id="modalidades"]/div/div/div[2]/input')
+-
+-        #filtro para pregão
+-        pagina.click('div[title="Pregão - Presencial"]')
+-        pagina.click('div[title="Pregão - Eletrônico"]')
+-
+-        #botao de pesquisar
+-        pagina.click('//*[@id="main-content"]/pncp-list/pncp-results-panel/pncp-tab-set/div/pncp-top-panel/div/div/div[3]/div[2]/button')
+-
+-        # Espera por um seletor específico (por segurança) , para garantir que toda a pagina carregou
+-        pagina.wait_for_timeout(4000)
+-        html = pagina.content()
+-        soup = BeautifulSoup(html, 'html.parser')
+-
+-        # variavel auxiliar que ira armazenar o conteudo dos for
+-        licitacoes = []
+-
+-        #encontra e printa o formulario do html
+-        for formulario in soup.find_all('a'):
+-            texto = formulario.get_text(separator='\n', strip=True)
+-
+-            # Remove caracteres nulos e espaços invisíveis
+-            texto = texto.replace('\x00', '')
+-            texto = re.sub(r'\n+', '\n', texto)  # reduz múltiplas quebras de linha seguidas
+-            texto = re.sub(r'\s{2,}', ' ', texto)  # substitui vários espaços seguidos por um único
+-
+-            licitacoes.append(texto)
+-
+-        # vai esperar 15 segundo ate fechar meu navegador
+-        time.sleep(10)
+-        return licitacoes
+-
+-# Recebe as licitações extraídas
+-dados = procurar_licitacoes()
+-
+-# Cria o PDF
+-pdf = FPDF()
+-pdf.add_page()
+-pdf.set_font('helvetica', size=12)
+-
+-# Adiciona um tít ulo
+-pdf.set_font("helvetica", 'B', 16)
+-pdf.cell(0, 10, "Licitações Disponíveis", new_x=XPos.LMARGIN, new_y=YPos.NEXT, align='C')
+-pdf.set_font("helvetica", size=12)
+-pdf.ln(10)
+-
+-# Adiciona o conteúdo
+-for linha in dados:
+-    pdf.multi_cell(0, 10, linha)
+-    pdf.ln(5)
+-
+-# Salva o arquivo
+-pdf.output("relatorio.pdf")
+Index: .idea/vcs.xml
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+diff --git a/.idea/vcs.xml b/.idea/vcs.xml
+deleted file mode 100644
+--- a/.idea/vcs.xml	(revision 1b0a77f66f705441902e6c6cdd2baad98cc2ad2a)
++++ /dev/null	(revision 1b0a77f66f705441902e6c6cdd2baad98cc2ad2a)
+@@ -1,4 +0,0 @@
+-<?xml version="1.0" encoding="UTF-8"?>
+-<project version="4">
+-  <component name="VcsDirectoryMappings" defaultProject="true" />
+-</project>
+\ No newline at end of file
+Index: .idea/.gitignore
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+diff --git a/.idea/.gitignore b/.idea/.gitignore
+deleted file mode 100644
+--- a/.idea/.gitignore	(revision 1b0a77f66f705441902e6c6cdd2baad98cc2ad2a)
++++ /dev/null	(revision 1b0a77f66f705441902e6c6cdd2baad98cc2ad2a)
+@@ -1,8 +0,0 @@
+-# Default ignored files
+-/shelf/
+-/workspace.xml
+-# Editor-based HTTP Client requests
+-/httpRequests/
+-# Datasource local storage ignored files
+-/dataSources/
+-/dataSources.local.xml

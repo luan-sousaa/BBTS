@@ -55,7 +55,7 @@ def procurar_licitacoes():
 dados = procurar_licitacoes()
 #chavee api
 #resumo e implementaçao da IA
-client = genai.Client(api_key="AIzaSyASo5XExbsu-UFgHmluhplhF98IOmOLSh0")
+client = genai.Client(api_key="")
 
 
 response = client.models.generate_content(
